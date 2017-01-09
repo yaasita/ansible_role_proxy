@@ -1,0 +1,4 @@
+
+# proxy
+proxy_http: http://192.168.0.100:8080
+proxy_https: http://192.168.0.100:8080

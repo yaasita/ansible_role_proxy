@@ -1,0 +1,25 @@
+---
+- name: apt-get の proxy を設定
+  template: src=apt.conf.j2 dest=/etc/apt/apt.conf owner=root group=root mode=0644
+
+- name: シェルProxy
+  template: src=proxy.sh.j2 dest=/etc/profile.d/proxy.sh owner=root group=root mode=0644
+  
+- name: set http_proxy
+  lineinfile: dest=/etc/environment regexp='^http_proxy' line='http_proxy="{{ proxy_http }}"'
+  when: proxy_http is defined
+
+- name: set https_proxy
+  lineinfile: dest=/etc/environment regexp='^https_proxy' line='https_proxy="{{ proxy_https }}"'
+  when: proxy_https is defined
+
+- name: keep proxy setting when using sudo
+  lineinfile: dest=/etc/sudoers regexp='http_proxy' insertafter='^Defaults +env_keep \+=' line='Defaults    env_keep += "http_proxy https_proxy"'
+  when: proxy_http is defined
+
+## yum
+#- name: insert yum proxy(http)
+#  lineinfile: dest=/etc/yum.conf state=present regexp="{{ http_proxy }}"
+#              insertafter=EOF line="proxy={{ http_proxy }}"
+#  ignore_errors: yes
+
